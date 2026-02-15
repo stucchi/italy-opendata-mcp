@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=75.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "italy-opendata-mcp"
+version = "0.1.0"
+description = "MCP server exposing Italian open data (admin, CAP, geo, demographics)"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp[cli]",
+    "httpx",
+]
+
+[project.scripts]
+italy-opendata-mcp = "italy_opendata_mcp.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
