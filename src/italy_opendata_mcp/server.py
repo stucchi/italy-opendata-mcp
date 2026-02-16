@@ -57,6 +57,12 @@ _COMUNE_COLS = """\
     c.nome,
     c.codice_catastale,
     c.popolazione,
+    c.superficie_kmq,
+    c.altitudine,
+    c.zona_altimetrica,
+    c.litoraneo,
+    c.isolano,
+    c.grado_urbanizzazione,
     c.latitudine,
     c.longitudine,
     c.sigla_provincia,
@@ -86,6 +92,51 @@ def _attach_caps(rows: list[dict]) -> None:
 # ---------------------------------------------------------------------------
 # Tools
 # ---------------------------------------------------------------------------
+
+
+@mcp.tool()
+async def list_regioni() -> str:
+    """Elenca tutte le regioni italiane con conteggio comuni e popolazione totale."""
+    await _ensure_ready()
+    rows = _query(
+        """SELECT r.codice, r.nome,
+                  COUNT(c.codice_istat) AS num_comuni,
+                  SUM(c.popolazione) AS popolazione_totale
+           FROM regioni r
+           LEFT JOIN comuni c ON c.codice_regione = r.codice
+           GROUP BY r.codice, r.nome
+           ORDER BY r.nome"""
+    )
+    return _format({"count": len(rows), "regioni": rows})
+
+
+@mcp.tool()
+async def list_province(
+    regione: Annotated[str | None, "Filtra per regione (nome o codice)"] = None,
+) -> str:
+    """Elenca le province italiane con conteggio comuni e popolazione totale."""
+    await _ensure_ready()
+
+    where = ""
+    params: tuple = ()
+    if regione:
+        norm_r = normalise(regione)
+        where = "WHERE r.codice = ? OR r.nome_normalizzato = ? OR r.nome_normalizzato LIKE ?"
+        params = (regione.strip(), norm_r, f"%{norm_r}%")
+
+    rows = _query(
+        f"""SELECT p.codice, p.nome, p.sigla, r.nome AS regione,
+                   COUNT(c.codice_istat) AS num_comuni,
+                   SUM(c.popolazione) AS popolazione_totale
+            FROM province p
+            JOIN regioni r ON p.codice_regione = r.codice
+            LEFT JOIN comuni c ON c.codice_provincia = p.codice
+            {where}
+            GROUP BY p.codice, p.nome, p.sigla, r.nome
+            ORDER BY r.nome, p.nome""",
+        params,
+    )
+    return _format({"count": len(rows), "province": rows})
 
 
 @mcp.tool()
@@ -153,7 +204,7 @@ async def list_comuni(
     provincia: Annotated[
         str | None, "Filtra per provincia (nome, sigla o codice)"
     ] = None,
-    limit: Annotated[int, "Numero massimo di risultati (default 100)"] = 100,
+    limit: Annotated[int, "Numero massimo di risultati (default 400)"] = 400,
 ) -> str:
     """Elenca i comuni italiani con filtri opzionali per regione o provincia."""
     await _ensure_ready()
