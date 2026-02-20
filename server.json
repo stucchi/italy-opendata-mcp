@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.stucchi/italy-opendata",
+  "title": "Italy OpenData",
+  "description": "MCP server for Italian open data: municipalities, provinces, regions, postal codes, coordinates, geographic data. Official ISTAT and ANPR sources.",
+  "repository": {
+    "url": "https://github.com/stucchi/italy-opendata-mcp",
+    "source": "github"
+  },
+  "version": "1.0.1",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "italy-opendata-mcp",
+      "version": "1.0.1",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

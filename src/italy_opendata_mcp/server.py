@@ -96,7 +96,7 @@ def _attach_caps(rows: list[dict]) -> None:
 
 @mcp.tool()
 async def list_regioni() -> str:
-    """Elenca tutte le regioni italiane con conteggio comuni e popolazione totale."""
+    """List all 20 Italian regions with municipality count and total population."""
     await _ensure_ready()
     rows = _query(
         """SELECT r.codice, r.nome,
@@ -112,9 +112,9 @@ async def list_regioni() -> str:
 
 @mcp.tool()
 async def list_province(
-    regione: Annotated[str | None, "Filtra per regione (nome o codice)"] = None,
+    regione: Annotated[str | None, "Filter by region (name or code)"] = None,
 ) -> str:
-    """Elenca le province italiane con conteggio comuni e popolazione totale."""
+    """List Italian provinces with municipality count and total population."""
     await _ensure_ready()
 
     where = ""
@@ -141,9 +141,9 @@ async def list_province(
 
 @mcp.tool()
 async def get_by_cap(
-    cap: Annotated[str, "Codice di avviamento postale (es. '00118')"],
+    cap: Annotated[str, "Italian postal code (e.g. '00118')"],
 ) -> str:
-    """Trova i comuni associati a un determinato CAP."""
+    """Find municipalities associated with a given postal code (CAP)."""
     await _ensure_ready()
     rows = _query(
         f"SELECT {_COMUNE_COLS} {_COMUNE_FROM} "
@@ -152,7 +152,7 @@ async def get_by_cap(
         (cap.strip(),),
     )
     if not rows:
-        return _format({"error": f"Nessun comune trovato per il CAP {cap}"})
+        return _format({"error": f"No municipality found for postal code {cap}"})
     _attach_caps(rows)
     return _format(rows if len(rows) > 1 else rows[0])
 
@@ -161,10 +161,10 @@ async def get_by_cap(
 async def get_comune(
     nome_o_codice: Annotated[
         str,
-        "Nome del comune o codice ISTAT a 6 cifre (es. 'Roma' o '058091')",
+        "Municipality name or 6-digit ISTAT code (e.g. 'Roma' or '058091')",
     ],
 ) -> str:
-    """Restituisce i dettagli di un comune cercato per nome o codice ISTAT."""
+    """Return full details of a municipality by name or ISTAT code."""
     await _ensure_ready()
     v = nome_o_codice.strip()
 
@@ -192,7 +192,7 @@ async def get_comune(
         )
 
     if not rows:
-        return _format({"error": f"Nessun comune trovato per '{nome_o_codice}'"})
+        return _format({"error": f"No municipality found for '{nome_o_codice}'"})
 
     _attach_caps(rows)
     return _format(rows[0] if len(rows) == 1 else rows)
@@ -200,13 +200,13 @@ async def get_comune(
 
 @mcp.tool()
 async def list_comuni(
-    regione: Annotated[str | None, "Filtra per regione (nome o codice)"] = None,
+    regione: Annotated[str | None, "Filter by region (name or code)"] = None,
     provincia: Annotated[
-        str | None, "Filtra per provincia (nome, sigla o codice)"
+        str | None, "Filter by province (name, abbreviation or code)"
     ] = None,
-    limit: Annotated[int, "Numero massimo di risultati (default 400)"] = 400,
+    limit: Annotated[int, "Maximum number of results (default 400)"] = 400,
 ) -> str:
-    """Elenca i comuni italiani con filtri opzionali per regione o provincia."""
+    """List Italian municipalities with optional region or province filters."""
     await _ensure_ready()
 
     where_parts: list[str] = []
@@ -244,10 +244,10 @@ async def list_comuni(
 @mcp.tool()
 async def refresh_dataset(
     force: Annotated[
-        bool, "Forza il re-download anche se i dati sono già presenti"
+        bool, "Force re-download even if data is already present"
     ] = False,
 ) -> str:
-    """Aggiorna il dataset scaricando i dati più recenti."""
+    """Refresh the dataset by downloading the latest data from sources."""
     global _conn
     if _conn is not None:
         _conn.close()
@@ -258,7 +258,7 @@ async def refresh_dataset(
 
 @mcp.tool()
 async def datasets_status() -> str:
-    """Mostra lo stato dei dataset locali (versione, ultimo aggiornamento, dimensione)."""
+    """Show local dataset status (version, last update, size)."""
     return _format(dataset_status())
 
 

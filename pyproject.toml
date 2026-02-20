@@ -4,8 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "italy-opendata-mcp"
-version = "1.0.0"
-description = "Server MCP per open data italiani (comuni, province, regioni, CAP, coordinate, dati geografici)"
+version = "1.0.1"
+description = "MCP server for Italian open data (municipalities, provinces, regions, postal codes, coordinates, geographic data)"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Ing. Luca Stucchi", email = "luca.stucchi@gmail.com" }]
+keywords = ["mcp", "italy", "opendata", "istat", "municipalities"]
 requires-python = ">=3.10"
 dependencies = [
     "mcp[cli]",

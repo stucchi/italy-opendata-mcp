@@ -1,30 +1,32 @@
 # italy-opendata-mcp
 
-Server MCP che espone gli open data italiani (comuni, province, regioni, CAP, coordinate, dati geografici) attraverso tool semplici e developer-friendly.
+MCP server exposing Italian open data (municipalities, provinces, regions, postal codes, coordinates, geographic data) through simple, developer-friendly tools.
 
-## Caratteristiche
+## Features
 
-- **7 tool MCP** per navigare la gerarchia amministrativa italiana
-- **Fonti ufficiali**: ISTAT e ANPR dove disponibili
-- **Lazy download**: i dati vengono scaricati al primo utilizzo e salvati in cache locale (~1.8 MB SQLite)
-- **Offline dopo il primo uso**: tutte le query sono locali
-- **Nessun Docker**: installabile via `uvx` o `pip`, si avvia e termina con Claude
+- **7 MCP tools** to navigate the Italian administrative hierarchy
+- **Official sources**: ISTAT and ANPR where available
+- **Lazy download**: data is fetched on first use and cached locally (~1.8 MB SQLite)
+- **Offline after first use**: all queries are local
+- **No Docker**: installable via `uvx` or `pip`, starts and stops with Claude
 
-## Fonti dati
+## Data sources
 
-| Dato | Fonte | Tipo |
-|------|-------|------|
-| Comuni, province, regioni, codici ISTAT | [ISTAT Elenco Comuni](https://www.istat.it/classificazione/codici-dei-comuni-delle-province-e-delle-regioni/) | Ufficiale |
-| Popolazione residente | [ANPR](https://github.com/italia/anpr-opendata) | Ufficiale (aggiornamento giornaliero) |
-| Superficie, altitudine, zona altimetrica | [ISTAT Classificazioni](https://www.istat.it/classificazione/principali-statistiche-geografiche-sui-comuni/) | Ufficiale |
-| CAP (codici postali) | [comuni-json](https://github.com/matteocontrini/comuni-json) | Community (nessuna fonte ufficiale disponibile) |
-| Coordinate centroide | [opendatasicilia](https://github.com/opendatasicilia/comuni-italiani) | Community (nessuna fonte ufficiale disponibile) |
+| Data | Source | Type |
+|------|--------|------|
+| Municipalities, provinces, regions, ISTAT codes | [ISTAT](https://www.istat.it/classificazione/codici-dei-comuni-delle-province-e-delle-regioni/) | Official |
+| Resident population | [ANPR](https://github.com/italia/anpr-opendata) | Official (daily updates) |
+| Surface area, altitude, altimetric zone | [ISTAT](https://www.istat.it/classificazione/principali-statistiche-geografiche-sui-comuni/) | Official |
+| Postal codes (CAP) | [comuni-json](https://github.com/matteocontrini/comuni-json) | Community (no official source available) |
+| Centroid coordinates | [opendatasicilia](https://github.com/opendatasicilia/comuni-italiani) | Community (no official source available) |
 
-## Installazione
+## Installation
 
-### Claude Desktop
+```bash
+uvx italy-opendata-mcp
+```
 
-Aggiungi al file di configurazione (`claude_desktop_config.json`):
+## Usage in .mcp.json
 
 ```json
 {
@@ -37,7 +39,7 @@ Aggiungi al file di configurazione (`claude_desktop_config.json`):
 }
 ```
 
-### Da sorgente
+### From source
 
 ```bash
 git clone https://github.com/stucchi/italy-opendata-mcp.git
@@ -45,45 +47,45 @@ cd italy-opendata-mcp
 uv venv && uv pip install -e .
 ```
 
-## Tool disponibili
+## Tools
 
-### Navigazione gerarchica
+### Hierarchical navigation
 
 ```
 list_regioni()  →  list_province(regione="Lombardia")  →  list_comuni(provincia="MI")
 ```
 
-| Tool | Parametri | Descrizione |
-|------|-----------|-------------|
-| `list_regioni` | — | Tutte le 20 regioni con numero comuni e popolazione |
-| `list_province` | `regione?` | Province con filtro regione opzionale |
-| `list_comuni` | `regione?`, `provincia?`, `limit?` | Comuni con filtri opzionali (default 400 risultati) |
+| Tool | Parameters | Description |
+|------|------------|-------------|
+| `list_regioni` | — | All 20 regions with municipality count and population |
+| `list_province` | `regione?` | Provinces with optional region filter |
+| `list_comuni` | `regione?`, `provincia?`, `limit?` | Municipalities with optional filters (default 400 results) |
 
-### Ricerca
+### Search
 
-| Tool | Parametri | Descrizione |
-|------|-----------|-------------|
-| `get_comune` | `nome_o_codice` | Dettagli completi di un comune per nome o codice ISTAT |
-| `get_by_cap` | `cap` | Trova i comuni associati a un codice postale |
+| Tool | Parameters | Description |
+|------|------------|-------------|
+| `get_comune` | `nome_o_codice` | Full details of a municipality by name or ISTAT code |
+| `get_by_cap` | `cap` | Find municipalities associated with a postal code |
 
-### Gestione dati
+### Data management
 
-| Tool | Parametri | Descrizione |
-|------|-----------|-------------|
-| `refresh_dataset` | `force?` | Ri-scarica i dati dalle fonti |
-| `datasets_status` | — | Stato della cache locale |
+| Tool | Parameters | Description |
+|------|------------|-------------|
+| `refresh_dataset` | `force?` | Re-download data from sources |
+| `datasets_status` | — | Local cache status |
 
-## Campi disponibili per comune
+## Available fields per municipality
 
-Ogni comune include:
+Each municipality includes:
 
-- **Anagrafica**: nome, codice ISTAT, codice catastale, sigla provincia, provincia, regione
-- **Demografia**: popolazione (ANPR, aggiornamento giornaliero)
-- **Geografia**: latitudine, longitudine, superficie km², altitudine (m), zona altimetrica
-- **Classificazione**: litoraneo, isolano, grado di urbanizzazione
-- **Postale**: lista CAP associati
+- **Registry**: name, ISTAT code, cadastral code, province abbreviation, province, region
+- **Demographics**: population (ANPR, daily updates)
+- **Geography**: latitude, longitude, surface area (km²), altitude (m), altimetric zone
+- **Classification**: coastal, island, urbanization degree
+- **Postal**: list of associated CAP codes
 
-## Esempio di output
+## Example output
 
 ```
 > get_comune("Roma")
@@ -108,27 +110,29 @@ Ogni comune include:
 
 ## Cache
 
-I dati vengono salvati localmente al primo utilizzo:
+Data is saved locally on first use:
 
-| OS | Percorso |
-|----|----------|
+| OS | Path |
+|----|------|
 | macOS / Linux | `~/.cache/italy-opendata-mcp/italia.db` |
 | Windows | `%LOCALAPPDATA%\italy-opendata-mcp\italia.db` |
 
-Per aggiornare i dati, usa il tool `refresh_dataset(force=True)`.
+To refresh data, use `refresh_dataset(force=True)`.
 
-## Copertura dati
+## Data coverage
 
-| | Conteggio |
+| | Count |
 |---|---|
-| Regioni | 20 |
-| Province | 107 |
-| Comuni | 7.896 |
-| Con popolazione | 7.896 |
-| Con coordinate | 7.889 |
-| Con dati geografici | 7.519 |
-| Con CAP | 7.887 |
+| Regions | 20 |
+| Provinces | 107 |
+| Municipalities | 7,896 |
+| With population | 7,896 |
+| With coordinates | 7,889 |
+| With geographic data | 7,519 |
+| With postal codes | 7,887 |
 
-## Licenza
+## License
 
 MIT
+
+<!-- mcp-name: io.github.stucchi/italy-opendata -->
