@@ -5,3 +5,6 @@ dist/
 build/
 .venv/
 uv.lock
+posts/
+
+.mcpregistry_*

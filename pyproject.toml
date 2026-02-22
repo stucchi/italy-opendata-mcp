@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "italy-opendata-mcp"
-version = "1.0.1"
+version = "1.0.2"
 description = "MCP server for Italian open data (municipalities, provinces, regions, postal codes, coordinates, geographic data)"
 readme = "README.md"
 license = "MIT"
